@@ -31,17 +31,28 @@ func parseFlags() {
 	// Check if action is delta or apply
 	if action == "delta" {
 		log.Printf("delta")
+		FlagsMandatoryCheck()
 		err := delta.CreateDelta(oldFile, newFile, patchFile, isCompressed)
 		if err != nil {
 			log.Panic(err)
 		}
 	} else if action == "apply" {
 		log.Printf("apply")
+		FlagsMandatoryCheck()
 		err := delta.ApplyDelta(oldFile, patchFile, newFile, isCompressed)
 		if err != nil {
 			log.Panic(err)
 		}
 	} else {
-		log.Fatalf("action must be delta or apply")
+		log.Fatalf("Action must be defines as delta or apply")
 	}
+}
+
+// FlagsMandatoryCheck checks if all flags are set
+func FlagsMandatoryCheck() {
+	flag.VisitAll(func(f *flag.Flag) {
+		if f.Value.String() == "" {
+			log.Fatalf("Flag %s is mandatory", f.Name)
+		}
+	})
 }
